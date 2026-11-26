@@ -4,7 +4,8 @@ from pathlib import Path
 
 import setuptools.command.bdist_wheel
 import torch
-from torch.utils.cpp_extension import BuildExtension, CppExtension, CUDAExtension
+#from torch.utils.cpp_extension import BuildExtension, CppExtension, CUDAExtension
+from torch.utils.cpp_extension import BuildExtension, CppExtension, CUDAExtension, ROCM_HOME
 
 __all__ = [
     "get_ext_modules",
@@ -83,7 +84,10 @@ def get_ext_modules():
         extra_compile_args["nvcc"] = ["-O2", "-DUSE_CUDA"]
     if _USE_ROCM:
         extension = CUDAExtension
-        extra_compile_args["nvcc"] = ["-O3"]
+        extra_compile_args["nvcc"] = [
+            "-O3",
+            f"-I{Path(ROCM_HOME) / 'include' / 'hipccl'}",
+        ]
 
     sources = [
         "utils.cpp",
